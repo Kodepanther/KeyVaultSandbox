@@ -2,29 +2,40 @@ trigger:
   branches:
     include:
       - dev
+      - staging
       - main
 
 pool:
-  name: SandboxAgent
+  name: SandBoxAgent
 
+# Use the variable group that links to Azure Key Vault
 variables:
-- group: DevSettings  # Optional if you have variable groups
+  - group: SandBox-kv-VariableGroup
 
 stages:
-- stage: KeyVaultTest
-  displayName: "Read Secrets from Azure Key Vault"
+- stage: Dev
+  displayName: "Deploy to Dev"
+  condition: eq(variables['Build.SourceBranchName'], 'dev')
   jobs:
-  - job: ReadSecrets
-    displayName: "Fetch Key Vault Secrets"
-    steps:
-    - task: AzureKeyVault@2
-      inputs:
-        azureSubscription: 'Azure-CloudCart-Connection'  # Your service connection name
-        KeyVaultName: 'mysandbox-keyvault-dev'                  # Replace with your vault name
-        SecretsFilter: '*'                           # Fetch all secrets (or use 'dbPassword' to fetch one)
-        RunAsPreJob: false
+    - job: DeployDev
+      steps:
+        - script: echo "Deploying to Dev environment..."
+          displayName: "Deployment step"
 
-    - script: |
-        echo "✅ Successfully retrieved Key Vault secret."
-        echo "Secret dbPassword value is hidden for security."
-      displayName: "Show success message"
+- stage: Staging
+  displayName: "Deploy to Staging"
+  condition: eq(variables['Build.SourceBranchName'], 'staging')
+  jobs:
+    - job: DeployStaging
+      steps:
+        - script: echo "Deploying to Staging environment..."
+          displayName: "Deployment step"
+
+- stage: Prod
+  displayName: "Deploy to Production"
+  condition: eq(variables['Build.SourceBranchName'], 'main')
+  jobs:
+    - job: DeployProd
+      steps:
+        - script: echo "Deploying to Production environment..."
+          displayName: "Deployment step"
