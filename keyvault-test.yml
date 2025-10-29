@@ -20,7 +20,7 @@ stages:
     - task: AzureKeyVault@2
       inputs:
         azureSubscription: 'Azure-CloudCart-Connection'  # Your service connection name
-        KeyVaultName: 'sandbox-my-keyvault'                  # Replace with your vault name
+        KeyVaultName: 'mysandbox-keyvault-dev'                  # Replace with your vault name
         SecretsFilter: '*'                           # Fetch all secrets (or use 'dbPassword' to fetch one)
         RunAsPreJob: false
 
