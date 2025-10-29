@@ -1,0 +1,30 @@
+trigger:
+  branches:
+    include:
+      - dev
+      - main
+
+pool:
+  name: SandboxAgent
+
+variables:
+- group: DevSettings  # Optional if you have variable groups
+
+stages:
+- stage: KeyVaultTest
+  displayName: "Read Secrets from Azure Key Vault"
+  jobs:
+  - job: ReadSecrets
+    displayName: "Fetch Key Vault Secrets"
+    steps:
+    - task: AzureKeyVault@2
+      inputs:
+        azureSubscription: 'Azure-CloudCart-Connection'  # Your service connection name
+        KeyVaultName: 'sandbox-my-keyvault'                  # Replace with your vault name
+        SecretsFilter: '*'                           # Fetch all secrets (or use 'dbPassword' to fetch one)
+        RunAsPreJob: false
+
+    - script: |
+        echo "✅ Successfully retrieved Key Vault secret."
+        echo "Secret dbPassword value is hidden for security."
+      displayName: "Show success message"
